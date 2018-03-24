@@ -16,12 +16,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.AddTodoActivity"></activity>
+        <activity android:name=".activity.AddTodoActivity" />
+
         <provider
-            android:authorities="@string/content_authority"
             android:name=".data.OsasTodoProvider"
+            android:authorities="@string/content_authority"
             android:exported="false"
-            android:syncable="true"/>
+            android:syncable="true" />
+
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/title_activity_settings" />
     </application>
 
 </manifest>

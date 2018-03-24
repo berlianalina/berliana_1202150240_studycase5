@@ -53,48 +53,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.pengaturan_warna:
-                showSettingDialog();
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    AlertDialog warnaDialog;
-    private void showSettingDialog() {
-        final CharSequence[] items = {"Green","Blue","Red"};
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Shape Color");
-        builder.setCancelable(true);
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                warnaDialog.dismiss();
-            }
-        });
-
-        builder.setSingleChoiceItems(items, App.getIndex(MainActivity.this), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int item) {
-                switch(item)
-                {
-                    case 0:
-                        App.setWarna(MainActivity.this, Color.GREEN, 0);
-                        break;
-                    case 1:
-                        App.setWarna(MainActivity.this, Color.BLUE, 1);
-                        break;
-                    case 2:
-                        App.setWarna(MainActivity.this, Color.RED, 2);
-                        break;
-
-                }
-                loadData();
-                warnaDialog.dismiss();
-            }
-        });
-
-        warnaDialog = builder.create();
-        warnaDialog.show();
     }
 
     private void setUpView() {

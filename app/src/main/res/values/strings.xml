@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Osas Todo List (Study Case 5)</string>
     <string name="content_authority">berliana_1202150240.studycase5.app</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_shape_color">Shape Color</string>
 </resources>
