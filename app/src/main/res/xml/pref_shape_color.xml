@@ -4,6 +4,7 @@
          dismiss it. -->
     <!-- This preference simply launches an intent when selected. Use this UI sparingly, per
          design guidelines. -->
+    <!-- XML Preference untuk membuat list setting pada PreferenceActivity -->
     <Preference
         android:key="shape_key"
         android:title="@string/pref_shape_color"

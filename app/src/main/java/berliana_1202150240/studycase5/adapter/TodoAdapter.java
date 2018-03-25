@@ -20,18 +20,18 @@ import berliana_1202150240.studycase5.data.OsasTodoContract;
 /**
  * Created by arrival瑞符 on 3/24/18.
  */
-
+//TodoAdapter mewarisi methods dari RecyclerViewCursorAdapter
 public class TodoAdapter extends RecyclerViewCursorAdapter<TodoAdapter.ViewHolder> {
 
-    private static final String LOG_TAG = TodoAdapter.class.getSimpleName();
     private Context mContext;
-    private static int sLoaderID;
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        //implement viewholder
         return new ViewHolder(mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent));
     }
 
+    //binding atau memasukkan data yang diterima dari activity yang memanggil TodoAdapter
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursorAdapter.getCursor().moveToPosition(position);
@@ -39,6 +39,7 @@ public class TodoAdapter extends RecyclerViewCursorAdapter<TodoAdapter.ViewHolde
         mCursorAdapter.bindView(null, mContext, mCursorAdapter.getCursor());
     }
 
+    //class viewholder untuk inisialisasi semua views dan method handler bindCursor
     public class ViewHolder extends RecyclerViewCursorViewHolder {
         public final LinearLayout rlRow;
         public final TextView tvName;
@@ -53,35 +54,40 @@ public class TodoAdapter extends RecyclerViewCursorAdapter<TodoAdapter.ViewHolde
             rlRow = (LinearLayout) view.findViewById(R.id.rlRow);
         }
 
+        //bindCursor berfungsi untuk menerima parameter cursor dan menerapkannya pada setiap views pada row
         @Override
         public void bindCursor(Cursor cursor) {
             rlRow.setBackgroundColor(Color.GREEN);
             rlRow.setBackgroundColor(App.getWarna(mContext));
 
-            int nameIndex = cursor.getColumnIndex(OsasTodoContract.DaftarInput.COLUMN_NAME);
+            int nameIndex = cursor.getColumnIndex(OsasTodoContract.DaftarInput.COLUMN_NAME); //mengambil index dari kolom name
             final String name = cursor.getString(nameIndex);
             tvName.setText(name);
 
-            int descIndex = cursor.getColumnIndex(OsasTodoContract.DaftarInput.COLUMN_DESCRIPTION);
+            int descIndex = cursor.getColumnIndex(OsasTodoContract.DaftarInput.COLUMN_DESCRIPTION); //mengambil index dari kolom description
             final String desc = cursor.getString(descIndex);
             tvDescription.setText(desc);
 
-            int priorityIndex = cursor.getColumnIndex(OsasTodoContract.DaftarInput.COLUMN_PRIORITY);
+            int priorityIndex = cursor.getColumnIndex(OsasTodoContract.DaftarInput.COLUMN_PRIORITY); //mengambil index dari kolom priority
             final int priority = cursor.getInt(priorityIndex);
             tvPriorityId.setText(priority + "");
         }
     }
 
+    //TodoAdapter konstruktor
     public TodoAdapter(Context context) {
         super(context);
         mContext = context;
-        setupCursorAdapter(null, 0, R.layout.row_todo, false);
+        setupCursorAdapter(null, 0, R.layout.row_todo, false); //set view row layout pada adapter
     }
 
+    //method untuk menghapus item pada recyclerview di adapter dan database
     public void deletePositionItem(int position) {
         mCursorAdapter.getCursor().moveToPosition(position);
         int nameIndex = mCursorAdapter.getCursor().getColumnIndex(OsasTodoContract.DaftarInput._ID);
         final int id = mCursorAdapter.getCursor().getInt(nameIndex);
+
+        //method menghapus data di database dengan content provider where (berdasarkan) id dari item tersebut
         mContext.getContentResolver().delete(OsasTodoContract.DaftarInput.CONTENT_URI, "_id = "+id, null);
     }
 }

@@ -13,8 +13,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by arrival on 3/24/18.
+ * Created by arrival瑞符 on 3/24/18.
  */
+
+//Class ini digenerate otomatis saat memilih New Activity -> Settings Activity
 public abstract class AppCompatPreferenceActivity extends PreferenceActivity {
 
     private AppCompatDelegate mDelegate;

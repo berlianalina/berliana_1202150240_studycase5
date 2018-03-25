@@ -8,17 +8,23 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Created by arrival瑞符 on 3/24/18.
  */
 
+/*membuat OsasTodoDBHelper dengan mewarisi method SQLiteOpenHelper
+Class ini berfungsi untuk membuat database SQLite
+ */
 public class OsasTodoDBHelper extends SQLiteOpenHelper {
 
+    //Declare nama db
     private static final String DATABASE_NAME = "osastodo.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 1; //versi db
 
+    //konstruktor
     public OsasTodoDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        //Query untuk menjalankan perintah create table "Daftar"
         final String SQL_CREATE_DAFTAR_TABLE = "CREATE TABLE " +
                 OsasTodoContract.DaftarInput.TABLE_DAFTAR + "(" + OsasTodoContract.DaftarInput._ID +
                 " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -28,17 +34,19 @@ public class OsasTodoDBHelper extends SQLiteOpenHelper {
                 OsasTodoContract.DaftarInput.COLUMN_PRIORITY +
                 " INTEGER NOT NULL);";
 
+        //Eksekusi query
         sqLiteDatabase.execSQL(SQL_CREATE_DAFTAR_TABLE);
     }
 
+    //method saat versi database di update
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        // Drop the table
+        //hapus table jika ada
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + OsasTodoContract.DaftarInput.TABLE_DAFTAR);
         sqLiteDatabase.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
                 OsasTodoContract.DaftarInput.TABLE_DAFTAR + "'");
 
-        // re-create database
+        //buat kembali tabel
         onCreate(sqLiteDatabase);
     }
 }

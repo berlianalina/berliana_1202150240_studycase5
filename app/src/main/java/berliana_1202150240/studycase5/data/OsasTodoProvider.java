@@ -16,13 +16,18 @@ import android.util.Log;
  * Created by arrival瑞符 on 3/24/18.
  */
 
+/*Class OsasTodoProvider mewarisi method ContentProvider
+Class ini berfungsi sebagai jembatan untuk melakukan transaction/eksekusi dari activity ke sqlite database
+ */
 public class OsasTodoProvider extends ContentProvider {
+    //Declare seluruh objek
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private OsasTodoDBHelper mOpenHelper;
 
     private static final int DAFTAR = 100;
     private static final int DAFTAR_ID = 200;
 
+    //membuat uri atau koneksi content provider
     private static UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
         final String authority = OsasTodoContract.CONTENT_AUTHORITY;
@@ -33,17 +38,20 @@ public class OsasTodoProvider extends ContentProvider {
         return matcher;
     }
 
+    //method yang dijalankan saat class di buat
     @Override
     public boolean onCreate() {
-        mOpenHelper = new OsasTodoDBHelper(getContext());
+        mOpenHelper = new OsasTodoDBHelper(getContext()); //inisialisasi DBHelper
         return true;
     }
 
+    //method untuk handling pengambilan data dengan berbagai case
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
+            //Select semua data
             case DAFTAR: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         OsasTodoContract.DaftarInput.TABLE_DAFTAR,
@@ -55,6 +63,7 @@ public class OsasTodoProvider extends ContentProvider {
                         s1);
                 return retCursor;
             }
+            //Select data berdasarkan ID
             case DAFTAR_ID: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         OsasTodoContract.DaftarInput.TABLE_DAFTAR,
@@ -72,15 +81,18 @@ public class OsasTodoProvider extends ContentProvider {
         }
     }
 
+    //method perwarisan dari ContentProvider untuk mendapatkan path dari content provider
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
+            //dir atau multi data
             case DAFTAR: {
                 return OsasTodoContract.DaftarInput.CONTENT_DIR_TYPE;
             }
+            //item atau single data
             case DAFTAR_ID: {
                 return OsasTodoContract.DaftarInput.CONTENT_ITEM_TYPE;
             }
@@ -90,17 +102,23 @@ public class OsasTodoProvider extends ContentProvider {
         }
     }
 
+    //method content provider untuk insert data
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
+        //akses DBHelper
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         Uri returnUri;
         switch (sUriMatcher.match(uri)) {
+            //menambahkan satu data
             case DAFTAR: {
+                //fungsi insert ke dalam database dengan nilai dari "contentValues" yang didapatkan dari parameter
                 long _id = db.insert(OsasTodoContract.DaftarInput.TABLE_DAFTAR, null, contentValues);
                 if (_id > 0) {
-                    returnUri = OsasTodoContract.DaftarInput.buildFlavorsUri(_id);
+                    //jika id lebih dari 0 input id
+                    returnUri = OsasTodoContract.DaftarInput.buildOsasUri(_id);
                 } else {
+                    //jika tidak lemparkan exception
                     throw new android.database.SQLException("Failed to insert row into: " + uri);
                 }
                 break;
@@ -111,22 +129,28 @@ public class OsasTodoProvider extends ContentProvider {
 
             }
         }
+        //notifychange atau trigger jika ada perubahan (refresh)
         getContext().getContentResolver().notifyChange(uri, null);
         return returnUri;
     }
 
+
+    //method delete data dari ContentProvider
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
+        //akses SQLite DBHelper
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int numDeleted;
         switch (match) {
+            //Delete satu table
             case DAFTAR:
                 numDeleted = db.delete(
                         OsasTodoContract.DaftarInput.TABLE_DAFTAR, s, strings);
                 db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" +
                         OsasTodoContract.DaftarInput.TABLE_DAFTAR + "'");
                 break;
+            //Delete satu row pada table berdasarkan name
             case DAFTAR_ID:
                 numDeleted = db.delete(OsasTodoContract.DaftarInput.TABLE_DAFTAR,
                         OsasTodoContract.DaftarInput.COLUMN_NAME + " = ?",
@@ -142,49 +166,7 @@ public class OsasTodoProvider extends ContentProvider {
         return numDeleted;
     }
 
-    @Override
-    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
-        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
-        final int match = sUriMatcher.match(uri);
-        switch (match) {
-            case DAFTAR:
-                db.beginTransaction();
-
-                int numInserted = 0;
-                try {
-                    for (ContentValues value : values) {
-                        if (value == null) {
-                            throw new IllegalArgumentException("content values tidak bisa kosong");
-                        }
-                        long _id = -1;
-                        try {
-                            _id = db.insertOrThrow(OsasTodoContract.DaftarInput.TABLE_DAFTAR,
-                                    null, value);
-                        } catch (SQLiteConstraintException e) {
-                            Log.w("Error", "Mencoba input data " +
-                                    value.getAsString(
-                                            OsasTodoContract.DaftarInput.COLUMN_NAME)
-                                    + " tapi nilai sudah ada di database.");
-                        }
-                        if (_id != -1) {
-                            numInserted++;
-                        }
-                    }
-                    if (numInserted > 0) {
-                        db.setTransactionSuccessful();
-                    }
-                } finally {
-                    db.endTransaction();
-                }
-                if (numInserted > 0) {
-                    getContext().getContentResolver().notifyChange(uri, null);
-                }
-                return numInserted;
-            default:
-                return super.bulkInsert(uri, values);
-        }
-    }
-
+    //method untuk melakukan update data pada ContentProvider (Tapi tidak diperlukan pada Study Case 5)
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
